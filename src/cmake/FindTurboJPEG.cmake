@@ -2,7 +2,7 @@
 # - Find the Turbo JPEG Library
 #=============================================================================
 # This module defines
-# 	TURBOJPEG_INCLUDE_DIR, where to find TagDetector.h, etc.
+# 	TURBOJPEG_INCLUDE_DIR, where to find turbojpeg.h, etc.
 # 	TURBOJPEG_LIB, libraries to link against to use Turbo JPEG.
 # 	TURBOJPEG_FOUND, libraries to link against to use Turbo JPEG.
 #
