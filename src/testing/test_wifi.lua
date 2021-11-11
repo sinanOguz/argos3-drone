@@ -12,9 +12,9 @@ function step()
    count = count + 1
    print("step " .. count .. ":")
    if true then  
-   robot.wifi.tx_data({count .. ": " .. pid})
+   robot.wifi.send({count .. ": " .. pid})
    end
-   for index, message in ipairs(robot.wifi.rx_data) do
+   for index, message in ipairs(robot.wifi.recv) do
       for k, v in pairs(message) do
          print(k,v)
       end
