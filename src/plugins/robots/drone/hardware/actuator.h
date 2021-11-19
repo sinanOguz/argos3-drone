@@ -7,10 +7,6 @@
 #ifndef PHYSICAL_ACTUATOR_H
 #define PHYSICAL_ACTUATOR_H
 
-namespace argos {
-   class CRobot;
-}
-
 #include <argos3/core/utility/plugins/factory.h>
 
 namespace argos {

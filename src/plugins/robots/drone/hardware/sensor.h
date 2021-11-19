@@ -7,10 +7,6 @@
 #ifndef PHYSICAL_SENSOR_H
 #define PHYSICAL_SENSOR_H
 
-namespace argos {
-   class CRobot;
-}
-
 #include <argos3/core/utility/plugins/factory.h>
 
 namespace argos {
