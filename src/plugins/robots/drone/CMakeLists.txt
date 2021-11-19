@@ -3,6 +3,7 @@
 #
 # argos3/plugins/robots/drone/hardware
 set(ARGOS3_HEADERS_PLUGINS_ROBOTS_DRONE_HARDWARE
+  hardware/actuator.h
   hardware/drone_cameras_system_default_sensor.h
   hardware/drone_flight_system_default_actuator.h
   hardware/drone_flight_system_default_sensor.h
@@ -12,7 +13,8 @@ set(ARGOS3_HEADERS_PLUGINS_ROBOTS_DRONE_HARDWARE
   hardware/pixhawk.h
   hardware/radios_default_actuator.h
   hardware/radios_default_sensor.h
-  hardware/robot.h)
+  hardware/robot.h
+  hardware/sensor.h)
 
 #
 # Drone sources
@@ -41,9 +43,10 @@ target_link_libraries(argos3 tbb
   ${IIO_LIBRARY}
   ${APRILTAG_LIBRARY}
   ${TURBOJPEG_LIBRARY})
+
+# Install executable and header files
 install(TARGETS argos3
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib/argos3
   ARCHIVE DESTINATION lib/argos3)
-
 install(FILES ${ARGOS3_HEADERS_PLUGINS_ROBOTS_DRONE_HARDWARE} DESTINATION include/argos3/plugins/robots/drone/hardware)
