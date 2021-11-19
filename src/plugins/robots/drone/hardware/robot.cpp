@@ -56,6 +56,7 @@ namespace argos {
          LOG << "[INFO] Set controller ID to: " << str_controller_id << std::endl;
          /* connect to the router if address was specified */
          if(!str_router_addr.empty()) {
+            /* connect to the router */
             size_t unHostnamePortPos = str_router_addr.find_last_of(':');
             try {
                if(unHostnamePortPos == std::string::npos) {

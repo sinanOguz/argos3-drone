@@ -35,7 +35,7 @@ namespace argos {
          static CRobot cRobot;
          return cRobot;
       }
-      
+
       void Init(TConfigurationNode& t_controller,
                 const std::string& str_controller_id,
                 const std::string& str_router_addr,

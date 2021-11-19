@@ -179,12 +179,12 @@ int main(int n_argc, char** ppch_argv) {
       /* initialize the drone */
       RunScripts(m_vecPreInitScripts);
       cRobot.Init(*itController,
-                   strControllerId,
-                   strRouterAddr,
-                   strPixhawkConf,
-                   strSensorDataPath,
-                   unTicksPerSec,
-                   unLength);
+                  strControllerId,
+                  strRouterAddr,
+                  strPixhawkConf,
+                  strSensorDataPath,
+                  unTicksPerSec,
+                  unLength);
       RunScripts(m_vecPostInitScripts);
       /* start the Drone's main loop */
       cRobot.Execute();
