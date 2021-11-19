@@ -1,5 +1,5 @@
 /**
- * @file <argos3/plugins/robots/generic/hardware/sensor.h>
+ * @file <argos3/plugins/robots/drone/hardware/sensor.h>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
@@ -29,11 +29,6 @@ namespace argos {
        * Class destructor.
        */
       virtual ~CPhysicalSensor() {}
-
-      /**
-       * Assigns the robot to this sensor.
-       */
-      virtual void SetRobot(CRobot& c_robot) {}
 
       /**
        * Updates the sensor with readings from the hardware.

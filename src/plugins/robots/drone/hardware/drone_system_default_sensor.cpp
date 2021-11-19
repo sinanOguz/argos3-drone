@@ -21,16 +21,6 @@ namespace argos {
 
    /****************************************/
    /****************************************/
-
-   CDroneSystemDefaultSensor::CDroneSystemDefaultSensor() {}
- 
-   /****************************************/
-   /****************************************/
-
-   CDroneSystemDefaultSensor::~CDroneSystemDefaultSensor() {}
-   
-   /****************************************/
-   /****************************************/
    
    void CDroneSystemDefaultSensor::Init(TConfigurationNode& t_tree) {
       try {

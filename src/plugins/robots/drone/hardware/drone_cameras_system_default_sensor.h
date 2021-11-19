@@ -29,8 +29,8 @@ struct v4l2_buffer;
 #include <argos3/core/utility/math/vector2.h>
 #include <argos3/core/utility/math/vector3.h>
 
-#include <argos3/plugins/robots/drone/hardware/drone.h>
-#include <argos3/plugins/robots/generic/hardware/sensor.h>
+#include <argos3/plugins/robots/drone/hardware/robot.h>
+#include <argos3/plugins/robots/drone/hardware/sensor.h>
 #include <argos3/plugins/robots/drone/control_interface/ci_drone_cameras_system_sensor.h>
 
 namespace argos {
@@ -40,11 +40,9 @@ namespace argos {
 
    public:
 
-      CDroneCamerasSystemDefaultSensor();
+      CDroneCamerasSystemDefaultSensor() {}
 
-      virtual ~CDroneCamerasSystemDefaultSensor();
-
-      virtual void SetRobot(CRobot& c_robot);
+      virtual ~CDroneCamerasSystemDefaultSensor() {}
 
       virtual void Init(TConfigurationNode& t_tree);
 

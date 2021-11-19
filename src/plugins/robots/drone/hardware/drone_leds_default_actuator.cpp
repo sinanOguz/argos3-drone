@@ -7,7 +7,7 @@
 #include "drone_leds_default_actuator.h"
 
 #include <argos3/core/utility/logging/argos_log.h>
-#include <argos3/plugins/robots/drone/hardware/drone.h>
+#include <argos3/plugins/robots/drone/hardware/robot.h>
 
 #include <cmath>
 #include <cerrno>

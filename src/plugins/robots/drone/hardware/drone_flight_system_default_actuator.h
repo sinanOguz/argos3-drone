@@ -13,8 +13,7 @@ namespace argos {
    class CRobot;
 }
 
-#include <argos3/plugins/robots/generic/hardware/actuator.h>
-#include <argos3/plugins/robots/drone/hardware/drone.h>
+#include <argos3/plugins/robots/drone/hardware/actuator.h>
 #include <argos3/plugins/robots/drone/control_interface/ci_drone_flight_system_actuator.h>
 
 #pragma GCC diagnostic push
@@ -30,17 +29,9 @@ namespace argos {
 
    public:
 
-      /**
-       * @brief Constructor.
-       */
-      CDroneFlightSystemDefaultActuator();
+      CDroneFlightSystemDefaultActuator() {}
 
-      /**
-       * @brief Destructor.
-       */
-      virtual ~CDroneFlightSystemDefaultActuator();
-
-      virtual void SetRobot(CRobot& c_robot);
+      virtual ~CDroneFlightSystemDefaultActuator() {}
 
       virtual void Init(TConfigurationNode& t_tree);
 
@@ -55,8 +46,6 @@ namespace argos {
    private:
 
       void Write(const mavlink_message_t& t_message);
-
-      CDrone::CPixhawk* m_pcPixhawk;
 
    };
 }

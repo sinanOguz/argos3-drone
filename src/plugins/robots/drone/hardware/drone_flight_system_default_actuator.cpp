@@ -6,10 +6,9 @@
  */
 
 #include "drone_flight_system_default_actuator.h"
-
 #include <argos3/core/utility/logging/argos_log.h>
-
-#include <argos3/plugins/robots/generic/hardware/robot.h>
+#include <argos3/plugins/robots/drone/hardware/robot.h>
+#include <argos3/plugins/robots/drone/hardware/pixhawk.h>
 
 #include <termios.h>
 
@@ -22,30 +21,6 @@
 #define MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_RATE     0b0000010111111111
 
 namespace argos {
-
-   /****************************************/
-   /****************************************/
-
-   CDroneFlightSystemDefaultActuator::CDroneFlightSystemDefaultActuator() :
-      m_pcPixhawk(nullptr) {}
-
-   /****************************************/
-   /****************************************/
-
-   CDroneFlightSystemDefaultActuator::~CDroneFlightSystemDefaultActuator() {}
-   
-   /****************************************/
-   /****************************************/
-
-   void CDroneFlightSystemDefaultActuator::SetRobot(CRobot& c_robot) {
-      CDrone* pcDrone = dynamic_cast<CDrone*>(&c_robot);
-      if(pcDrone == nullptr) {
-         THROW_ARGOSEXCEPTION("The drone flight system sensor only works with the drone")
-      }
-      else {
-         m_pcPixhawk = &pcDrone->GetPixhawk();
-      }
-   }
 
    /****************************************/
    /****************************************/
@@ -63,21 +38,21 @@ namespace argos {
    /****************************************/
 
    void CDroneFlightSystemDefaultActuator::Update() {
-      if(m_pcPixhawk->Ready()) {
+      if(CRobot::GetInstance().GetPixhawk().Ready()) {
          CVector3& cInitialOrientation =
-            m_pcPixhawk->GetInitialOrientation().value();
+            CRobot::GetInstance().GetPixhawk().GetInitialOrientation().value();
          CVector3& cInitialPosition =
-            m_pcPixhawk->GetInitialPosition().value();
+            CRobot::GetInstance().GetPixhawk().GetInitialPosition().value();
          uint8_t unTargetSystem =
-            m_pcPixhawk->GetTargetSystem().value();
+            CRobot::GetInstance().GetPixhawk().GetTargetSystem().value();
          CVector3& fTargetPosition = m_cTargetPosition;
          /* ENU to NED */
          fTargetPosition.Set(fTargetPosition.GetX(), -fTargetPosition.GetY(), -fTargetPosition.GetZ());
          fTargetPosition.RotateZ(CRadians(cInitialOrientation.GetZ()));
          /* initialize a setpoint struct */
          mavlink_set_position_target_local_ned_t tSetpoint;
-         tSetpoint.target_system    = m_pcPixhawk->GetTargetSystem().value();
-         tSetpoint.target_component = m_pcPixhawk->GetTargetComponent().value();
+         tSetpoint.target_system    = CRobot::GetInstance().GetPixhawk().GetTargetSystem().value();
+         tSetpoint.target_component = CRobot::GetInstance().GetPixhawk().GetTargetComponent().value();
          tSetpoint.type_mask = MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_POSITION &
 				   		          MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_ANGLE;
          tSetpoint.coordinate_frame = MAV_FRAME_LOCAL_NED;
@@ -109,25 +84,25 @@ namespace argos {
    /****************************************/
 
    bool CDroneFlightSystemDefaultActuator::Ready() {
-      return m_pcPixhawk->Ready();
+      return CRobot::GetInstance().GetPixhawk().Ready();
    }
 
    /****************************************/
    /****************************************/
 
    void CDroneFlightSystemDefaultActuator::Arm(bool b_arm, bool b_bypass_safety_checks) {
-      if(m_pcPixhawk->Ready()) {
+      if(CRobot::GetInstance().GetPixhawk().Ready()) {
          /* build commmand for arming/disarming the drone */
          mavlink_command_long_t tCommand = {0};
-         tCommand.target_system    = m_pcPixhawk->GetTargetSystem().value();
-         tCommand.target_component = m_pcPixhawk->GetTargetComponent().value();
+         tCommand.target_system    = CRobot::GetInstance().GetPixhawk().GetTargetSystem().value();
+         tCommand.target_component = CRobot::GetInstance().GetPixhawk().GetTargetComponent().value();
          tCommand.command          = MAV_CMD_COMPONENT_ARM_DISARM;
          tCommand.confirmation     = 1;
          tCommand.param1           = b_arm ? 1.0f : 0.0f;
          tCommand.param2           = b_bypass_safety_checks ? 21196.0f : 0.0f;
          /* encode the message */
          mavlink_message_t tMessage;
-         mavlink_msg_command_long_encode(m_pcPixhawk->GetTargetSystem().value(),
+         mavlink_msg_command_long_encode(CRobot::GetInstance().GetPixhawk().GetTargetSystem().value(),
                                          0,
                                          &tMessage,
                                          &tCommand);
@@ -160,17 +135,17 @@ namespace argos {
    /****************************************/
 
    void CDroneFlightSystemDefaultActuator::SetOffboardMode(bool b_offboard_mode) {
-      if(m_pcPixhawk->Ready()) {
+      if(CRobot::GetInstance().GetPixhawk().Ready()) {
          /* build commmand for entering/exiting off-board mode */
          mavlink_command_long_t tCommand = {0};
-         tCommand.target_system    = m_pcPixhawk->GetTargetSystem().value();
-         tCommand.target_component = m_pcPixhawk->GetTargetComponent().value();
+         tCommand.target_system    = CRobot::GetInstance().GetPixhawk().GetTargetSystem().value();
+         tCommand.target_component = CRobot::GetInstance().GetPixhawk().GetTargetComponent().value();
          tCommand.command          = MAV_CMD_NAV_GUIDED_ENABLE;
          tCommand.confirmation     = 1;
          tCommand.param1           = b_offboard_mode ? 1.0f : 0.0f;
          /* encode the message */
          mavlink_message_t tMessage;
-         mavlink_msg_command_long_encode(m_pcPixhawk->GetTargetSystem().value(),
+         mavlink_msg_command_long_encode(CRobot::GetInstance().GetPixhawk().GetTargetSystem().value(),
                                          0,
                                          &tMessage,
                                          &tCommand);
@@ -208,12 +183,12 @@ namespace argos {
       uint16_t unLength = ::mavlink_msg_to_send_buffer(arrBuffer.data(), &t_message);
       /* write message to Pixhawk */
       ssize_t nResult = 
-         ::write(m_pcPixhawk->GetFileDescriptor(),
+         ::write(CRobot::GetInstance().GetPixhawk().GetFileDescriptor(),
                  reinterpret_cast<char*>(arrBuffer.data()),
                  unLength);
       if(nResult == unLength) {
          /* wait until all data has been written */
-         ::tcdrain(m_pcPixhawk->GetFileDescriptor());
+         ::tcdrain(CRobot::GetInstance().GetPixhawk().GetFileDescriptor());
       }
       else {
          THROW_ARGOSEXCEPTION("Could not write command to Pixhawk: " << ::strerror(errno));

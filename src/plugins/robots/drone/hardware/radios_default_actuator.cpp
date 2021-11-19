@@ -1,37 +1,31 @@
 /**
- * @file <argos3/plugins/robots/generic/simulator/wifi_default_actuator.cpp>
+ * @file <argos3/plugins/robots/drone/hardware/radios_default_actuator.cpp>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
 
-#include "wifi_default_actuator.h"
+#include "radios_default_actuator.h"
 
 #include <argos3/core/utility/logging/argos_log.h>
 #include <argos3/core/utility/networking/tcp_socket.h>
-#include <argos3/plugins/robots/generic/hardware/robot.h>
+#include <argos3/plugins/robots/drone/hardware/robot.h>
 
 namespace argos {
 
    /****************************************/
    /****************************************/
 
-   void CWifiDefaultActuator::SetRobot(CRobot& c_robot) {
-      m_pcSocket = &c_robot.GetSocket();
-   }
-
-   /****************************************/
-   /****************************************/
-
-   void CWifiDefaultActuator::Init(TConfigurationNode& t_tree) {
+   void CRadiosDefaultActuator::Init(TConfigurationNode& t_tree) {
       try {
          /* Parent class init */
-         CCI_WifiActuator::Init(t_tree);
-         if(!m_pcSocket->IsConnected()) {
+         CCI_RadiosActuator::Init(t_tree);
+         if(!CRobot::GetInstance().GetSocket().IsConnected()) {
             LOGERR << "[WARNING] Robot is not connected to a router" << std::endl;
          }
+         m_vecInterfaces.emplace_back("wifi");
       }
       catch(CARGoSException& ex) {
-         THROW_ARGOSEXCEPTION_NESTED("Error initializing the wifi default actuator", ex);
+         THROW_ARGOSEXCEPTION_NESTED("Error initializing the radio default actuator", ex);
       }
    }
 
@@ -39,32 +33,32 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   void CWifiDefaultActuator::Update() {
+   void CRadiosDefaultActuator::Update() {
       /* send messages if the socket is connected */
-      if(m_pcSocket->IsConnected()) {
-         for(const CByteArray& c_message : m_lstMessages) {
-            m_pcSocket->SendByteArray(c_message);
+      if(CRobot::GetInstance().GetSocket().IsConnected()) {
+         for(const CByteArray& c_message : m_vecInterfaces[0].Messages) {
+            CRobot::GetInstance().GetSocket().SendByteArray(c_message);
          }
          /* Flush data from the control interface */
-         m_lstMessages.clear();
+         m_vecInterfaces[0].Messages.clear();
       }
    }
 
    /****************************************/
    /****************************************/
 
-   void CWifiDefaultActuator::Reset() {
-      m_lstMessages.clear();
+   void CRadiosDefaultActuator::Reset() {
+      m_vecInterfaces[0].Messages.clear();
    }
 
    /****************************************/
    /****************************************/
 
-   REGISTER_ACTUATOR(CWifiDefaultActuator,
-                     "wifi", "default",
+   REGISTER_ACTUATOR(CRadiosDefaultActuator,
+                     "radios", "default",
                      "Michael Allwright [allsey87@gmail.com]",
                      "1.0",
-                     "Hardware implementation of the wifi actuator.",
+                     "Hardware implementation of the radio actuator.",
                      "This actuator sends messages to other robots using the local network.",
                      "Usable"
    );

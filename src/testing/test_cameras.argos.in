@@ -17,22 +17,22 @@
       <sensors>
         <drone_cameras_system implementation="default">
           <camera id="arm0"
-                  device="/dev/video0" 
+                  device="/dev/camera0"
                   capture_resolution="1024,768"
                   processing_resolution="1024,768"
                   processing_offset="0,0"/>
           <camera id="arm1"
-                  device="/dev/video2" 
+                  device="/dev/camera1"
                   capture_resolution="1024,768"
                   processing_resolution="1024,768"
                   processing_offset="0,0"/>
           <camera id="arm2"
-                  device="/dev/video4" 
+                  device="/dev/camera2"
                   capture_resolution="1024,768"
                   processing_resolution="1024,768"
                   processing_offset="0,0"/>
           <camera id="arm3"
-                  device="/dev/video6" 
+                  device="/dev/camera3"
                   capture_resolution="1024,768"
                   processing_resolution="1024,768"
                   processing_offset="0,0"/>

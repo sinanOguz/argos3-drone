@@ -9,7 +9,7 @@
 #include <argos3/core/utility/logging/argos_log.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
 
-#include <argos3/plugins/robots/drone/hardware/drone.h>
+#include <argos3/plugins/robots/drone/hardware/robot.h>
 
 #include <iio.h>
 
@@ -44,8 +44,8 @@ namespace argos {
       try {
          CCI_DroneRangefindersSensor::Init(t_tree);
          /* Get context and trigger */
-         iio_context* psContext = CDrone::GetInstance().GetContext();
-         iio_device* psUpdateTrigger = CDrone::GetInstance().GetSensorUpdateTrigger();
+         iio_context* psContext = CRobot::GetInstance().GetContext();
+         iio_device* psUpdateTrigger = CRobot::GetInstance().GetSensorUpdateTrigger();
          /* Parse the device name and channel names */
          std::string strDevice;
          GetNodeAttribute(t_tree, "device", strDevice);

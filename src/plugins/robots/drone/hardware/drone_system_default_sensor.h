@@ -11,7 +11,7 @@ namespace argos {
    class CDroneSystemDefaultSensor;
 }
 
-#include <argos3/plugins/robots/generic/hardware/sensor.h>
+#include <argos3/plugins/robots/drone/hardware/sensor.h>
 #include <argos3/plugins/robots/drone/control_interface/ci_drone_system_sensor.h>
 
 #include <chrono>
@@ -23,15 +23,9 @@ namespace argos {
 
    public:
 
-      /**
-       * @brief Constructor.
-       */
-      CDroneSystemDefaultSensor();
+      CDroneSystemDefaultSensor() {}
 
-      /**
-       * @brief Destructor.
-       */
-      virtual ~CDroneSystemDefaultSensor();
+      virtual ~CDroneSystemDefaultSensor() {}
 
       virtual void Init(TConfigurationNode& t_tree);
 

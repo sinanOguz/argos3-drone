@@ -13,8 +13,7 @@ namespace argos {
    class CRobot;
 }
 
-#include <argos3/plugins/robots/generic/hardware/sensor.h>
-#include <argos3/plugins/robots/drone/hardware/drone.h>
+#include <argos3/plugins/robots/drone/hardware/sensor.h>
 #include <argos3/plugins/robots/drone/control_interface/ci_drone_flight_system_sensor.h>
 
 #pragma GCC diagnostic push
@@ -32,21 +31,18 @@ namespace argos {
 
    public:
 
-      CDroneFlightSystemDefaultSensor();
+      CDroneFlightSystemDefaultSensor() {}
 
-      virtual ~CDroneFlightSystemDefaultSensor();
-
-      virtual void SetRobot(CRobot& c_robot);
+      virtual ~CDroneFlightSystemDefaultSensor() {}
 
       virtual void Init(TConfigurationNode& t_tree);
 
       virtual void Update();
 
    private:
-   
-      CDrone::CPixhawk* m_pcPixhawk;
 
       std::optional<mavlink_message_t> Read();
+
       void Decode(const mavlink_message_t& t_message);
 
       std::optional<mavlink_heartbeat_t> m_tHeartbeat;

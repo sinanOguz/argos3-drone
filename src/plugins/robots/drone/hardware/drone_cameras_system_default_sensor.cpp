@@ -41,29 +41,6 @@ namespace argos {
 
    /****************************************/
    /****************************************/
-   
-   CDroneCamerasSystemDefaultSensor::CDroneCamerasSystemDefaultSensor() {}
-
-   /****************************************/
-   /****************************************/
-
-   CDroneCamerasSystemDefaultSensor::~CDroneCamerasSystemDefaultSensor() {}
-   
-   /****************************************/
-   /****************************************/
-
-   void CDroneCamerasSystemDefaultSensor::SetRobot(CRobot& c_robot) {
-      CDrone* pcDrone = dynamic_cast<CDrone*>(&c_robot);
-      if(pcDrone == nullptr) {
-         THROW_ARGOSEXCEPTION("The drone cameras system sensor only works with the drone")
-      }
-      else {
-         m_strSensorDataPath = pcDrone->GetSensorDataPath();
-      }
-   }
-
-   /****************************************/
-   /****************************************/
 
    void CDroneCamerasSystemDefaultSensor::Init(TConfigurationNode& t_tree) {
       /* expect four cameras */
@@ -82,10 +59,12 @@ namespace argos {
                THROW_ARGOSEXCEPTION("No configuration found for interface with id \"" << strId << "\"")
             }
             else {
+               const std::string& strSensorDataPath =
+                  CRobot::GetInstance().GetSensorDataPath();
                m_vecPhysicalInterfaces.emplace_back(itConfig->first,
                                                     itConfig->second,
                                                     *itInterface,
-                                                    m_strSensorDataPath);
+                                                    strSensorDataPath);
             }
          }
          for(SPhysicalInterface& s_physical_interface : m_vecPhysicalInterfaces) {
@@ -102,8 +81,9 @@ namespace argos {
    /****************************************/
 
    void CDroneCamerasSystemDefaultSensor::Destroy() {
-      if(!m_strSensorDataPath.empty()) {
-         ticpp::Document cMetadata(m_strSensorDataPath + "/metadata.xml");
+      const std::string& strSensorDataPath = CRobot::GetInstance().GetSensorDataPath();
+      if(!strSensorDataPath.empty()) {
+         ticpp::Document cMetadata(strSensorDataPath + "/metadata.xml");
          ticpp::Declaration cDecl("1.0", "", "");
          cMetadata.InsertEndChild(cDecl);
          ticpp::Element cRoot("cameras_system_metadata");

@@ -6,40 +6,15 @@
  */
 
 #include "drone_flight_system_default_sensor.h"
-
 #include <argos3/core/utility/logging/argos_log.h>
-
-#include <argos3/plugins/robots/generic/hardware/robot.h>
+#include <argos3/plugins/robots/drone/hardware/robot.h>
+#include <argos3/plugins/robots/drone/hardware/pixhawk.h>
 
 namespace argos {
 
    /****************************************/
-   /****************************************/
+   /****************************************/ 
 
-   CDroneFlightSystemDefaultSensor::CDroneFlightSystemDefaultSensor() :
-      m_pcPixhawk(nullptr) {}
-   
-   /****************************************/
-   /****************************************/
-
-   CDroneFlightSystemDefaultSensor::~CDroneFlightSystemDefaultSensor() {}
-   
-   /****************************************/
-   /****************************************/
-
-   void CDroneFlightSystemDefaultSensor::SetRobot(CRobot& c_robot) {
-      CDrone* pcDrone = dynamic_cast<CDrone*>(&c_robot);
-      if(pcDrone == nullptr) {
-         THROW_ARGOSEXCEPTION("The drone flight system sensor only works with the drone")
-      }
-      else {
-         m_pcPixhawk = &pcDrone->GetPixhawk();
-      }
-   }
-
-   /****************************************/
-   /****************************************/
-   
    void CDroneFlightSystemDefaultSensor::Init(TConfigurationNode& t_tree) {
       try {
          CCI_DroneFlightSystemSensor::Init(t_tree);
@@ -53,17 +28,14 @@ namespace argos {
    /****************************************/
    
    void CDroneFlightSystemDefaultSensor::Update() {
-      // TODO write back initial postion, system id, component id for use in the actuator half
-      // TODO handle timestamp messages?
-
       /* read and decode all messages */
       while(std::optional<mavlink_message_t> tMessage = Read()) {
          /* initialize the target system and component identifiers if not already done */
-         if(!m_pcPixhawk->GetTargetSystem()) {
-            m_pcPixhawk->GetTargetSystem().emplace(tMessage.value().sysid);
+         if(!CRobot::GetInstance().GetPixhawk().GetTargetSystem()) {
+            CRobot::GetInstance().GetPixhawk().GetTargetSystem().emplace(tMessage.value().sysid);
          }
-         if(!m_pcPixhawk->GetTargetComponent()) {
-            m_pcPixhawk->GetTargetComponent().emplace(tMessage.value().compid);
+         if(!CRobot::GetInstance().GetPixhawk().GetTargetComponent()) {
+            CRobot::GetInstance().GetPixhawk().GetTargetComponent().emplace(tMessage.value().compid);
          }
          Decode(tMessage.value());
       }
@@ -90,11 +62,11 @@ namespace argos {
             m_tLocalPositionNed.value();
          CVector3 cLocalPositionNed(tReading.x, tReading.y, tReading.z);
          /* set the initial position if not already set, it should be in NED*/
-         if(!m_pcPixhawk->GetInitialPosition()) {
-            m_pcPixhawk->GetInitialPosition().emplace(cLocalPositionNed);
+         if(!CRobot::GetInstance().GetPixhawk().GetInitialPosition()) {
+            CRobot::GetInstance().GetPixhawk().GetInitialPosition().emplace(cLocalPositionNed);
          }
-         if(m_pcPixhawk->GetInitialOrientation()) {
-            CVector3& cInitialOrientation = m_pcPixhawk->GetInitialOrientation().value();
+         if(CRobot::GetInstance().GetPixhawk().GetInitialOrientation()) {
+            CVector3& cInitialOrientation = CRobot::GetInstance().GetPixhawk().GetInitialOrientation().value();
             /* NED to ENU */
             cLocalPositionNed.RotateZ(CRadians(-cInitialOrientation.GetZ())); 
             m_cPosition.Set(cLocalPositionNed.GetX(), -cLocalPositionNed.GetY(), -cLocalPositionNed.GetZ());
@@ -104,11 +76,11 @@ namespace argos {
          m_tLocalPositionNed.reset();
       }
       if (m_tPositionTargetLocalNed) {
-         if(m_pcPixhawk->GetInitialOrientation()) {
+         if(CRobot::GetInstance().GetPixhawk().GetInitialOrientation()) {
             const mavlink_position_target_local_ned_t &tReading =
                 m_tPositionTargetLocalNed.value();
             CVector3 cTargetPosition(tReading.x, tReading.y, tReading.z);
-            CVector3& cInitialOrientation = m_pcPixhawk->GetInitialOrientation().value();
+            CVector3& cInitialOrientation = CRobot::GetInstance().GetPixhawk().GetInitialOrientation().value();
             /* NED to ENU */
             cTargetPosition.RotateZ(CRadians(-cInitialOrientation.GetZ()));
             m_cTargetPosition.Set(cTargetPosition.GetX(), -cTargetPosition.GetY(), -cTargetPosition.GetZ());
@@ -121,8 +93,8 @@ namespace argos {
             m_tAttitude.value();
          m_cOrientation.Set(tReading.roll, tReading.pitch, tReading.yaw);
          /* set the initial orientation if not already set */
-         if(!m_pcPixhawk->GetInitialOrientation()) {
-            m_pcPixhawk->GetInitialOrientation().emplace(m_cOrientation);
+         if(!CRobot::GetInstance().GetPixhawk().GetInitialOrientation()) {
+            CRobot::GetInstance().GetPixhawk().GetInitialOrientation().emplace(m_cOrientation);
          }
          /* NED to ENU */
          /* @Sinan TODO: double check the signs of m_cOrientation values with real tests */
@@ -215,11 +187,11 @@ namespace argos {
 
    std::optional<mavlink_message_t> CDroneFlightSystemDefaultSensor::Read() {
       /* only attempt to read if the connect is open */
-      if(m_pcPixhawk->GetFileDescriptor() >= 0) {
+      if(CRobot::GetInstance().GetPixhawk().GetFileDescriptor() >= 0) {
          mavlink_message_t tMessage;
          mavlink_status_t tStatus;
          uint8_t unRxChar;
-         while(::read(m_pcPixhawk->GetFileDescriptor(), &unRxChar, 1)) {
+         while(::read(CRobot::GetInstance().GetPixhawk().GetFileDescriptor(), &unRxChar, 1)) {
             switch(::mavlink_parse_char(::MAVLINK_COMM_1, unRxChar, &tMessage, &tStatus)) {
             case ::MAVLINK_FRAMING_INCOMPLETE:
                break;

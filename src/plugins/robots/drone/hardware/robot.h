@@ -1,11 +1,11 @@
 /**
- * @file <argos3/plugins/robots/drone/hardware/drone.h>
+ * @file <argos3/plugins/robots/drone/hardware/robot.h>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
 
-#ifndef DRONE_H
-#define DRONE_H
+#ifndef ROBOT_H
+#define ROBOT_H
 
 namespace argos {
    class CLuaController;
@@ -22,40 +22,18 @@ struct iio_device;
 #include <argos3/core/utility/math/vector3.h>
 #include <argos3/core/utility/networking/tcp_socket.h>
 #include <argos3/core/utility/configuration/argos_configuration.h>
-#include <argos3/plugins/robots/generic/hardware/robot.h>
+
+#include "pixhawk.h"
 
 namespace argos {
 
-   class CDrone : public CRobot {
+   class CRobot {
 
    public:
 
-      class CPixhawk {
-      public:
-         CPixhawk();
-         void Open(const std::string& str_device, SInt32 n_baud);
-         void Close();
-         int GetFileDescriptor();
-         std::optional<CVector3>& GetInitialPosition();
-         std::optional<CVector3>& GetInitialOrientation();
-         std::optional<uint8_t>& GetTargetSystem();
-         std::optional<uint8_t>& GetTargetComponent();
-         /* indicates that the sensor side is up and running
-            and has initialized what is necessary for flight */
-         bool Ready();
-      private:
-         int m_nFileDescriptor;
-         std::optional<uint8_t> m_optTargetSystem;
-         std::optional<uint8_t> m_optTargetComponent;
-         std::optional<CVector3> m_optInitialPosition;
-         std::optional<CVector3> m_optInitialOrientation;
-      };
-
-   public:
-
-      static CDrone& GetInstance() {
-         static CDrone cDrone;
-         return cDrone;
+      static CRobot& GetInstance() {
+         static CRobot cRobot;
+         return cRobot;
       }
       
       void Init(TConfigurationNode& t_controller,
@@ -87,17 +65,21 @@ namespace argos {
          return m_unTicksPerSec;
       }
 
-      CPixhawk& GetPixhawk() {
-         return m_cPixhawk;
-      }
-
       const std::string& GetSensorDataPath() {
          return m_strSensorDataPath;
       }
 
+      CPixhawk& GetPixhawk() {
+         return m_cPixhawk;
+      }
+
+      CTCPSocket& GetSocket() {
+         return m_cSocket;
+      }
+
    private:
 
-      CDrone() :
+      CRobot() :
          m_bSignalRaised(false),
          m_unTicksPerSec(0),
          m_unLength(0),
@@ -105,7 +87,7 @@ namespace argos {
          m_psContext(nullptr),
          m_psSensorUpdateTrigger(nullptr) {}
 
-      virtual ~CDrone() {}
+      virtual ~CRobot() {}
 
    private:
 
@@ -122,6 +104,12 @@ namespace argos {
       /* pointer to the controller */
       CLuaController* m_pcController;
 
+      /* the pixhawk device */
+      CPixhawk m_cPixhawk;
+
+      /* connection to the message router */
+      CTCPSocket m_cSocket;
+
       /* the vector of actuators */
       std::vector<CPhysicalActuator*> m_vecActuators;
 
@@ -135,8 +123,6 @@ namespace argos {
       iio_context* m_psContext;
       iio_device* m_psSensorUpdateTrigger;
 
-      /* the pixhawk state */
-      CPixhawk m_cPixhawk;
    };
 
 }

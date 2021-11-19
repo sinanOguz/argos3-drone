@@ -15,7 +15,7 @@ namespace argos {
 #include <optional>
 
 #include <argos3/core/utility/datatypes/color.h>
-#include <argos3/plugins/robots/generic/hardware/actuator.h>
+#include <argos3/plugins/robots/drone/hardware/actuator.h>
 #include <argos3/plugins/robots/drone/control_interface/ci_drone_leds_actuator.h>
 
 namespace argos {

@@ -10,7 +10,7 @@
 
 #include <argos3/core/utility/configuration/command_line_arg_parser.h>
 #include <argos3/core/utility/plugins/dynamic_loading.h>
-#include <argos3/plugins/robots/drone/hardware/drone.h>
+#include <argos3/plugins/robots/drone/hardware/robot.h>
 
 using namespace argos;
 
@@ -34,7 +34,7 @@ void RunScripts(const std::vector<SScript>& vec_scripts) {
 }
 
 void handler(int n_signal) {
-  CDrone::GetInstance().SetSignal(n_signal);
+  CRobot::GetInstance().SetSignal(n_signal);
   /* allow the user to kill application immediately with ctrl-c */
   std::signal(SIGINT, SIG_DFL);
   /* ignore other signals and attempt to allow the robot to shutdown */
@@ -174,11 +174,11 @@ int main(int n_argc, char** ppch_argv) {
       /* get the target number of ticks */
       UInt32 unLength = 0;
       GetNodeAttributeOrDefault(tExperiment, "length", unLength, unLength);
-      /* get Drone instance */
-      CDrone& cDrone = CDrone::GetInstance();
+      /* get robot instance */
+      CRobot& cRobot = CRobot::GetInstance();
       /* initialize the drone */
       RunScripts(m_vecPreInitScripts);
-      cDrone.Init(*itController,
+      cRobot.Init(*itController,
                    strControllerId,
                    strRouterAddr,
                    strPixhawkConf,
@@ -187,10 +187,10 @@ int main(int n_argc, char** ppch_argv) {
                    unLength);
       RunScripts(m_vecPostInitScripts);
       /* start the Drone's main loop */
-      cDrone.Execute();
+      cRobot.Execute();
       /* clean up */
       RunScripts(m_vecPreDestroyScripts);
-      cDrone.Destroy();
+      cRobot.Destroy();
       RunScripts(m_vecPostDestroyScripts);
       /* load all libraries */
       CDynamicLoading::UnloadAllLibraries();

@@ -1,5 +1,5 @@
 /**
- * @file <argos3/plugins/robots/generic/hardware/actuator.h>
+ * @file <argos3/plugins/robots/drone/hardware/actuator.h>
  *
  * @author Michael Allwright - <allsey87@gmail.com>
  */
@@ -31,12 +31,7 @@ namespace argos {
       virtual ~CPhysicalActuator() {}
 
       /**
-       * Assigns the robot to this actuator.
-       */
-      virtual void SetRobot(CRobot& c_robot) {}
-
-      /**
-       * Updates the state of the entity associated to this actuator.
+       * Updates the actuator.
        */
       virtual void Update() = 0;
 
