@@ -14,6 +14,7 @@ function step()
                     robot.system.temperatures[3],
                     robot.system.temperatures[4])
    log("temperatures = " .. temp_str);
+   log("random integer = " .. string.format("%.0f", robot.random.uniform_int(0,20)));
 end
 
 --[[ This function is executed every time you press the 'reset'

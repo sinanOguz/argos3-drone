@@ -117,8 +117,6 @@ int main(int n_argc, char** ppch_argv) {
             }
          }
       }
-      /* initialize the RNG */
-      CRandom::CreateCategory("argos", 0);
       /* load all libraries */
       CDynamicLoading::LoadAllLibraries();
       /* create the configuration with the provided file */
@@ -168,6 +166,17 @@ int main(int n_argc, char** ppch_argv) {
       }
       /* get the experiment node */
       TConfigurationNode& tExperiment = GetNode(tFramework, "experiment");
+      /* get random seed, initializing from current time if zero */
+      UInt32 unRandomSeed = 0;
+      GetNodeAttributeOrDefault(tExperiment, "random_seed", unRandomSeed, unRandomSeed);
+      if(unRandomSeed == 0) {
+         struct timeval sTimeValue;
+         ::gettimeofday(&sTimeValue, nullptr);
+         unRandomSeed = static_cast<UInt32>(sTimeValue.tv_usec);
+      }
+      LOG << "[INFO] Using random seed = " << unRandomSeed << std::endl;
+      /* initialize the RNG */
+      CRandom::CreateCategory("argos", unRandomSeed);
       /* get the target tick length */
       UInt32 unTicksPerSec = 0;
       GetNodeAttribute(tExperiment, "ticks_per_second", unTicksPerSec);
@@ -192,10 +201,10 @@ int main(int n_argc, char** ppch_argv) {
       RunScripts(m_vecPreDestroyScripts);
       cRobot.Destroy();
       RunScripts(m_vecPostDestroyScripts);
-      /* load all libraries */
-      CDynamicLoading::UnloadAllLibraries();
       /* uninitialize the RNG */
       CRandom::RemoveCategory("argos");
+      /* load all libraries */
+      CDynamicLoading::UnloadAllLibraries();
    } catch (CARGoSException& ex) {
       LOGERR << ex.what() << std::endl;
       return EXIT_FAILURE;
