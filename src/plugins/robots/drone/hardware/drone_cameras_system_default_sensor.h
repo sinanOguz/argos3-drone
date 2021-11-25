@@ -76,18 +76,35 @@ namespace argos {
             return m_cMetadata;
          }
 
+         const TConfiguration& GetConfiguration() const {
+            return m_tConfiguration;
+         };
+
       private:
          /* calibration data */
          struct SCalibration {
             CVector3 PositionError;
             CQuaternion OrientationError;
             CSquareMatrix<3> CameraMatrix;
+            CVector3 DistortionK;
+            CVector2 DistortionP;
          } m_sCalibration;
+         void UndistortPixel(double& fU, double& fV);
          /* sensor configuration */
          std::array<UInt32, 2> m_arrCaptureResolution;
          std::array<UInt32, 2> m_arrProcessingResolution;
          std::array<UInt32, 2> m_arrProcessingOffset;
+         /* camera parameters */
+         UInt8 m_unCameraBrightness = 8;
+         UInt8 m_unCameraContrast = 8;
+         bool m_bCameraExposureAuto = true;
+         UInt16 m_unCameraExposureAbsoluteTime = 1250;
+         bool m_bExposureTimeSetFlag = false;
+         /* camera position and orientation */
+         TConfiguration m_tConfiguration;
          /* tag detector data */
+         std::string m_strTagFamilyName;
+         Real m_fTagSideLength;
          ::image_u8_t* m_ptImage;
          ::apriltag_family* m_ptTagFamily;
          ::apriltag_detector* m_ptTagDetector;
@@ -116,6 +133,10 @@ namespace argos {
 
       /* path to save camera sensor data */
       std::string m_strSensorDataPath;
+
+   private:
+      static const UInt8 UNDISTORT_ITERATIONS;
+      static const Real DEFAULT_TAG_SIDE_LENGTH;
 
       /****************************************/
       /****************************************/
