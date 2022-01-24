@@ -11,8 +11,8 @@ set(ARGOS3_HEADERS_PLUGINS_ROBOTS_DRONE_HARDWARE
   hardware/drone_rangefinders_default_sensor.h
   hardware/drone_system_default_sensor.h
   hardware/pixhawk.h
-  hardware/radios_default_actuator.h
-  hardware/radios_default_sensor.h
+  hardware/simple_radios_default_actuator.h
+  hardware/simple_radios_default_sensor.h
   hardware/robot.h
   hardware/sensor.h)
 
@@ -30,8 +30,8 @@ set(ARGOS3_SOURCES_PLUGINS_ROBOTS_DRONE_HARDWARE
   hardware/drone_system_default_sensor.cpp
   hardware/main.cpp
   hardware/pixhawk.cpp
-  hardware/radios_default_actuator.cpp
-  hardware/radios_default_sensor.cpp  
+  hardware/simple_radios_default_actuator.cpp
+  hardware/simple_radios_default_sensor.cpp  
   hardware/robot.cpp)
 
 # Create an executable for the robot
