@@ -85,13 +85,10 @@ namespace argos {
             const mavlink_position_target_local_ned_t &tReading =
                 m_tPositionTargetLocalNed.value();
             CVector3 cTargetPosition(tReading.x, tReading.y, tReading.z);
-            CVector3 cTargetVelocity(tReading.x, tReading.y, tReading.z);
             CVector3& cInitialOrientation = CRobot::GetInstance().GetPixhawk().GetInitialOrientation().value();
             /* NED to ENU */
             cTargetPosition.RotateZ(CRadians(-cInitialOrientation.GetZ()));
-            cTargetVelocity.RotateZ(CRadians(-cInitialOrientation.GetZ()));
             m_cTargetPosition.Set(cTargetPosition.GetX(), -cTargetPosition.GetY(), -cTargetPosition.GetZ());
-            m_cTargetVelocity.Set(cTargetVelocity.GetX(), -cTargetVelocity.GetY(), -cTargetVelocity.GetZ());
          }
          /* clear out the read data */
          m_tPositionTargetLocalNed.reset();
