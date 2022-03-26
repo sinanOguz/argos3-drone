@@ -61,17 +61,22 @@ namespace argos {
          const mavlink_local_position_ned_t& tReading =
             m_tLocalPositionNed.value();
          CVector3 cLocalPositionNed(tReading.x, tReading.y, tReading.z);
+         CVector3 cLocalVelocityNed(tReading.vx, tReading.vy, tReading.vz);
          /* set the initial position if not already set, it should be in NED*/
          if(!CRobot::GetInstance().GetPixhawk().GetInitialPosition()) {
             CRobot::GetInstance().GetPixhawk().GetInitialPosition().emplace(cLocalPositionNed);
          }
          if(CRobot::GetInstance().GetPixhawk().GetInitialOrientation()) {
             CVector3& cInitialOrientation = CRobot::GetInstance().GetPixhawk().GetInitialOrientation().value();
+            CVector3& cInitialPosition = CRobot::GetInstance().GetPixhawk().GetInitialPosition().value();
+            /*ToDo: don't do the following, instead remove the initial position sum on the actuator side*/
+            cLocalPositionNed = cLocalPositionNed - cInitialPosition;
             /* NED to ENU */
             cLocalPositionNed.RotateZ(CRadians(-cInitialOrientation.GetZ())); 
+            cLocalVelocityNed.RotateZ(CRadians(-cInitialOrientation.GetZ()));
             m_cPosition.Set(cLocalPositionNed.GetX(), -cLocalPositionNed.GetY(), -cLocalPositionNed.GetZ());
+            m_cVelocity.Set(cLocalVelocityNed.GetX(), -cLocalVelocityNed.GetY(), -cLocalVelocityNed.GetZ());
          }
-         m_cVelocity.Set(tReading.vx, -tReading.vy, -tReading.vz);
          /* clear out the read data */
          m_tLocalPositionNed.reset();
       }
