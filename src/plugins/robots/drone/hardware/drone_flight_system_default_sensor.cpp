@@ -67,6 +67,9 @@ namespace argos {
          }
          if(CRobot::GetInstance().GetPixhawk().GetInitialOrientation()) {
             CVector3& cInitialOrientation = CRobot::GetInstance().GetPixhawk().GetInitialOrientation().value();
+            CVector3& cInitialPosition = CRobot::GetInstance().GetPixhawk().GetInitialPosition().value();
+            /*ToDo: don't do the following, instead remove the initial position sum on the actuator side*/
+            cLocalPositionNed = cLocalPositionNed - cInitialPosition;
             /* NED to ENU */
             cLocalPositionNed.RotateZ(CRadians(-cInitialOrientation.GetZ())); 
             m_cPosition.Set(cLocalPositionNed.GetX(), -cLocalPositionNed.GetY(), -cLocalPositionNed.GetZ());
