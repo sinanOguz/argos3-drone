@@ -39,29 +39,36 @@ namespace argos {
 
    void CDroneFlightSystemDefaultActuator::Update() {
       if(CRobot::GetInstance().GetPixhawk().Ready()) {
-         CVector3& cInitialOrientation =
+        CVector3& cInitialOrientation =
             CRobot::GetInstance().GetPixhawk().GetInitialOrientation().value();
-         CVector3& cInitialPosition =
-            CRobot::GetInstance().GetPixhawk().GetInitialPosition().value();
+   /*       CVector3& cInitialPosition =
+            CRobot::GetInstance().GetPixhawk().GetInitialPosition().value(); */
          uint8_t unTargetSystem =
             CRobot::GetInstance().GetPixhawk().GetTargetSystem().value();
-         CVector3& fTargetPosition = m_cTargetPosition;
+         // CVector3& fTargetPosition = m_cTargetPosition;
+         CVector3& fTargetVelocity = m_cTargetVelocity;
          /* ENU to NED */
-         fTargetPosition.Set(fTargetPosition.GetX(), -fTargetPosition.GetY(), -fTargetPosition.GetZ());
-         fTargetPosition.RotateZ(CRadians(cInitialOrientation.GetZ()));
+          // fTargetPosition.Set(fTargetPosition.GetX(), -fTargetPosition.GetY(), -fTargetPosition.GetZ());
+         fTargetVelocity.Set(fTargetVelocity.GetX(), -fTargetVelocity.GetY(), -fTargetVelocity.GetZ());
+         fTargetVelocity.RotateZ(CRadians(cInitialOrientation.GetZ()));
+          // fTargetPosition.RotateZ(CRadians(cInitialOrientation.GetZ()));
          /* initialize a setpoint struct */
          mavlink_set_position_target_local_ned_t tSetpoint;
          tSetpoint.target_system    = CRobot::GetInstance().GetPixhawk().GetTargetSystem().value();
          tSetpoint.target_component = CRobot::GetInstance().GetPixhawk().GetTargetComponent().value();
-         tSetpoint.type_mask = MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_POSITION &
-				   		          MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_ANGLE;
+         tSetpoint.type_mask = MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_VELOCITY &
+				   		          MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_RATE;
          tSetpoint.coordinate_frame = MAV_FRAME_LOCAL_NED;
-         tSetpoint.x = fTargetPosition.GetX() + cInitialPosition.GetX();
+         tSetpoint.vx = fTargetVelocity.GetX();
+         tSetpoint.vy = fTargetVelocity.GetY();
+         tSetpoint.vz = fTargetVelocity.GetZ();
+          /* tSetpoint.x = fTargetPosition.GetX() + cInitialPosition.GetX();
          tSetpoint.y = fTargetPosition.GetY() + cInitialPosition.GetY();
-         tSetpoint.z = fTargetPosition.GetZ() + cInitialPosition.GetZ();
+         tSetpoint.z = fTargetPosition.GetZ() + cInitialPosition.GetZ(); */
          /* ENU to NED */
          /* @Sinan TODO: double check the sign of m_cTargetYawAngle with real tests */
-         tSetpoint.yaw = -m_cTargetYawAngle.GetValue() + cInitialOrientation.GetZ();
+          // tSetpoint.yaw = -m_cTargetYawAngle.GetValue() + cInitialOrientation.GetZ();
+         tSetpoint.yaw_rate = -m_cTargerYawRate.GetValue(); 
          mavlink_message_t tMessage;
          mavlink_msg_set_position_target_local_ned_encode(unTargetSystem, 0, &tMessage, &tSetpoint);
          try {
