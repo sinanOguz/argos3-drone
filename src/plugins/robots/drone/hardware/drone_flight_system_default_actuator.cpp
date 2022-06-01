@@ -68,7 +68,7 @@ namespace argos {
          /* ENU to NED */
          /* @Sinan TODO: double check the sign of m_cTargetYawAngle with real tests */
           // tSetpoint.yaw = -m_cTargetYawAngle.GetValue() + cInitialOrientation.GetZ();
-         tSetpoint.yaw_rate = -m_cTargerYawRate.GetValue(); 
+         tSetpoint.yaw_rate = -m_cTargetYawRate.GetValue(); 
          mavlink_message_t tMessage;
          mavlink_msg_set_position_target_local_ned_encode(unTargetSystem, 0, &tMessage, &tSetpoint);
          try {
